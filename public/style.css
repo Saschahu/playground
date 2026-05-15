@@ -251,8 +251,8 @@ tr:first-child td.score { color: var(--accent-yellow); }
   --pg-f-head:     'Outfit', system-ui, sans-serif;
   --pg-f-mono:     'Space Mono', ui-monospace, Menlo, monospace;
   --pg-max-width:  1720px;
-  --pg-col-lb:     300px;
-  --pg-col-queue:  300px;
+  --pg-col-lb:     380px;
+  --pg-col-queue:  380px;
   --pg-gap:        1rem;
 }
 
@@ -514,6 +514,9 @@ body.pg-index a:hover { color: var(--pg-lime); }
   display: flex;
   flex-direction: column;
   min-height: 0;
+  justify-self: center;
+  width: min(75vh, 800px);
+  max-width: 100%;
 }
 
 .pg-game-header {
@@ -592,9 +595,10 @@ body.pg-index a:hover { color: var(--pg-lime); }
 }
 
 .pg-canvas-zone canvas {
-  width: min(100%, calc(100vh - 165px));
+  width: 100%;
   height: auto;
   aspect-ratio: 1;
+  max-height: min(75vh, 800px);
   max-width: 100%;
   image-rendering: pixelated;
   border-radius: 4px;
