@@ -14,6 +14,9 @@ CREATE TABLE IF NOT EXISTS games (
   final_ticks INTEGER,
   end_reason TEXT,
   rng_seed INTEGER NOT NULL,
+  status TEXT DEFAULT 'active',
+  queued_at TIMESTAMP,
+  activated_at TIMESTAMP,
   FOREIGN KEY (bot_id) REFERENCES bots(id)
 );
 
@@ -28,3 +31,4 @@ CREATE TABLE IF NOT EXISTS moves (
 CREATE INDEX IF NOT EXISTS idx_games_bot_id ON games(bot_id);
 CREATE INDEX IF NOT EXISTS idx_games_final_score ON games(final_score DESC);
 CREATE INDEX IF NOT EXISTS idx_games_ended_at ON games(ended_at DESC);
+CREATE INDEX IF NOT EXISTS idx_games_status ON games(status);

@@ -6,26 +6,30 @@ const DIRECTIONS = ['up', 'down', 'left', 'right'];
 
 export function createMcpServer(gameManager, rateLimiter, timeoutWorker, leaderboard) {
   const server = new McpServer(
-    { name: 'playground', version: '0.2.0' },
+    { name: 'playground', version: '0.4.0' },
     { capabilities: { tools: {} } }
   );
 
   server.tool(
     'start_game',
-    'start a new snake game. returns game_id and initial state.',
+    'start a new snake game. returns game_id and initial state, or queued status if another game is active.',
     {
       bot_id: z.string().describe('your bot uuid v4 (persist this between calls)'),
-      bot_name: z.string().optional().describe('optional display name')
+      bot_name: z.string().optional().describe('optional display name (auto-generated if omitted)')
     },
     async ({ bot_id, bot_name }) => {
       validateBotId(bot_id);
       rateLimiter.checkCanStart(bot_id);
-      gameManager.ensureBot(bot_id, bot_name);
-      const { gameId, state } = gameManager.startGame(bot_id);
-      timeoutWorker.recordStart(gameId);
-      return {
-        content: [{ type: 'text', text: JSON.stringify({ game_id: gameId, state }, null, 2) }]
-      };
+      const result = gameManager.startGame(bot_id, bot_name || null);
+      if (result.status === 'active') {
+        return {
+          content: [{ type: 'text', text: JSON.stringify({ game_id: result.gameId, state: result.state, status: 'active' }, null, 2) }]
+        };
+      } else {
+        return {
+          content: [{ type: 'text', text: JSON.stringify({ game_id: result.gameId, status: 'queued', position: result.position, message: result.message }, null, 2) }]
+        };
+      }
     }
   );
 
@@ -54,25 +58,28 @@ export function createMcpServer(gameManager, rateLimiter, timeoutWorker, leaderb
 
   server.tool(
     'get_state',
-    'get the current state of an active game (for recovery).',
+    'get the current state of an active game (for recovery or checking queue position).',
     {
       bot_id: z.string(),
       game_id: z.string()
     },
     async ({ bot_id, game_id }) => {
       validateBotId(bot_id);
+      // check if queued
+      const queuedPos = gameManager.getQueuedGame(bot_id);
+      if (queuedPos) {
+        return { content: [{ type: 'text', text: JSON.stringify({ status: 'queued', position: queuedPos.position }) }] };
+      }
       const game = gameManager.activeGames.get(game_id);
       if (!game) {
         const row = gameManager.db.prepare('SELECT * FROM games WHERE id = ?').get(game_id);
         if (!row) throw new Error(`unknown game: ${game_id}`);
         if (row.bot_id !== bot_id) throw new Error(`not your game`);
-        return {
-          content: [{ type: 'text', text: JSON.stringify({ ended: true, final_score: row.final_score, end_reason: row.end_reason }) }]
-        };
+        return { content: [{ type: 'text', text: JSON.stringify({ ended: true, final_score: row.final_score, end_reason: row.end_reason }) }] };
       }
       if (game.botId !== bot_id) throw new Error(`not your game`);
       return {
-        content: [{ type: 'text', text: JSON.stringify({ state: game.state }, null, 2) }]
+        content: [{ type: 'text', text: JSON.stringify({ state: game.state, status: 'active' }, null, 2) }]
       };
     }
   );

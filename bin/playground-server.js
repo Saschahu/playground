@@ -23,6 +23,9 @@ const rateLimiter = new RateLimiter(gameManager);
 const timeoutWorker = new TimeoutWorker(gameManager);
 timeoutWorker.start();
 
+// register timeoutWorker via event instead of inline in mcp handler
+gameManager.on('game:start', ({ gameId }) => timeoutWorker.recordStart(gameId));
+
 const mcpServerFactory = () => createMcpServer(gameManager, rateLimiter, timeoutWorker, leaderboard);
 const apiRouter = createApiRouter(gameManager, leaderboard);
 const app = createHttpApp(mcpServerFactory, apiRouter);

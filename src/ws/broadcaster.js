@@ -22,9 +22,11 @@ export class Broadcaster {
       const snapshot = [...gameManager.activeGames.entries()].map(([gameId, g]) => ({
         gameId,
         botId: g.botId,
+        botName: g.botName,
         state: g.state
       }));
-      ws.send(JSON.stringify({ event: 'snapshot', data: { activeGames: snapshot } }));
+      const queueSnap = gameManager.queue.snapshot();
+      ws.send(JSON.stringify({ event: 'snapshot', data: { activeGames: snapshot, queue: queueSnap.queue } }));
 
       ws.on('close', () => this.clients.delete(ws));
       ws.on('error', () => this.clients.delete(ws));
@@ -33,6 +35,8 @@ export class Broadcaster {
     gameManager.on('game:start', (e) => this.broadcast('game:start', e));
     gameManager.on('game:move', (e) => this.broadcast('game:move', e));
     gameManager.on('game:end', (e) => this.broadcast('game:end', e));
+    gameManager.on('queue:add', (e) => this.broadcast('queue:add', e));
+    gameManager.on('queue:promote', (e) => this.broadcast('queue:promote', e));
   }
 
   broadcast(event, data) {

@@ -10,6 +10,7 @@ export function createApiRouter(gameManager, leaderboard) {
       const active = [...gameManager.activeGames.entries()].map(([gameId, g]) => ({
         gameId,
         botId: g.botId,
+        botName: g.botName,
         state: g.state
       }));
       res.json({ data: active });
@@ -21,15 +22,17 @@ export function createApiRouter(gameManager, leaderboard) {
     try {
       const limit = Math.min(parseInt(req.query.limit) || 20, 100);
       const rows = db.prepare(`
-        SELECT id, bot_id, started_at, ended_at, final_score, final_ticks, end_reason
-        FROM games WHERE ended_at IS NOT NULL
-        ORDER BY ended_at DESC LIMIT ?
+        SELECT g.id, g.bot_id, b.name as bot_name, g.started_at, g.ended_at, g.final_score, g.final_ticks, g.end_reason
+        FROM games g
+        JOIN bots b ON b.id = g.bot_id
+        WHERE g.ended_at IS NOT NULL AND g.status = 'ended'
+        ORDER BY g.ended_at DESC LIMIT ?
       `).all(limit);
       res.json({ data: rows });
     } catch (e) { res.status(500).json({ error: e.message }); }
   });
 
-  // GET /api/games/:id/moves — für replay
+  // GET /api/games/:id/moves — fur replay
   router.get('/games/:id/moves', (req, res) => {
     try {
       const game = db.prepare('SELECT id, rng_seed FROM games WHERE id = ?').get(req.params.id);
@@ -39,7 +42,7 @@ export function createApiRouter(gameManager, leaderboard) {
     } catch (e) { res.status(500).json({ error: e.message }); }
   });
 
-  // GET /api/games/:id/states — computed state-sequence für replay
+  // GET /api/games/:id/states — computed state-sequence fur replay
   router.get('/games/:id/states', async (req, res) => {
     try {
       const game = db.prepare('SELECT id, bot_id, rng_seed, final_score, end_reason FROM games WHERE id = ?').get(req.params.id);
@@ -82,6 +85,17 @@ export function createApiRouter(gameManager, leaderboard) {
       const period = ['all', 'week', 'day'].includes(req.query.period) ? req.query.period : 'all';
       const top = leaderboard.top(limit, period);
       res.json({ data: top, period });
+    } catch (e) { res.status(500).json({ error: e.message }); }
+  });
+
+  // GET /api/queue
+  router.get('/queue', (req, res) => {
+    try {
+      const snap = gameManager.queue.snapshot();
+      const active = snap.activeGameId ? [...gameManager.activeGames.entries()]
+        .filter(([id]) => id === snap.activeGameId)
+        .map(([gameId, g]) => ({ gameId, botId: g.botId, botName: g.botName })) : [];
+      res.json({ data: { active: active[0] || null, queue: snap.queue } });
     } catch (e) { res.status(500).json({ error: e.message }); }
   });
 
