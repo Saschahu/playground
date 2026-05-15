@@ -1,0 +1,29 @@
+# dependencies
+node_modules/
+
+# runtime data (db lives on the vps, not in source)
+data/
+*.db
+*.db-journal
+
+# logs
+*.log
+logs/
+
+# env
+.env
+.env.*
+
+# editor/os
+.DS_Store
+.vscode/
+.idea/
+*.swp
+
+# test artifacts
+coverage/
+.nyc_output/
+
+# backups
+*.before-*
+*.bak

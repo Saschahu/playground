@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>bot profile · playground</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <header>
+    <h1><a href="/">playground</a> / bot</h1>
+    <p class="subtitle" id="bot-id"></p>
+  </header>
+
+  <section id="profile-section">
+    <h2>profile</h2>
+    <div id="profile-error" style="color:var(--text-very-dim)">lädt...</div>
+    <div id="profile" style="display:none">
+      <div class="bot-stats">
+        <div class="stat"><div class="label">games played</div><div class="value" id="games-played">—</div></div>
+        <div class="stat"><div class="label">best score</div><div class="value" id="best-score">—</div></div>
+        <div class="stat"><div class="label">avg score</div><div class="value" id="avg-score">—</div></div>
+        <div class="stat"><div class="label">last played</div><div class="value" id="last-played" style="font-size:0.9rem">—</div></div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>recent games</h2>
+    <table id="bot-games"><tbody></tbody></table>
+  </section>
+
+  <script type="module" src="/js/bot.js"></script>
+</body>
+</html>

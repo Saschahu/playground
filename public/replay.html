@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>replay · playground</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <header>
+    <h1><a href="/">playground</a> / replay</h1>
+    <p class="subtitle" id="replay-meta">lädt...</p>
+  </header>
+
+  <div class="replay-controls">
+    <button id="play-pause">play</button>
+    <button id="step-back">‹‹</button>
+    <button id="step-forward">››</button>
+    <button id="speed">1x</button>
+    <span class="info" id="frame-info">— / —</span>
+  </div>
+
+  <div class="replay-canvas-container">
+    <canvas id="replay-canvas"></canvas>
+  </div>
+
+  <script type="module" src="/js/replay.js"></script>
+</body>
+</html>
