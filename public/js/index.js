@@ -13,11 +13,86 @@ const queueEl       = document.getElementById('queue');
 const leaderboardEl = document.getElementById('leaderboard');
 const recentEl      = document.querySelector('#recent tbody');
 
+// -- Replay ---------------------------------------------------
+let replayFrames = [];
+let replayMeta   = null;
+let replayTimer  = null;
+let replayIdx    = 0;
+
+async function startReplay() {
+  stopReplay();
+  try {
+    const recent = await api.get('/games/recent?limit=1');
+    if (!recent || recent.length === 0) return;
+    const g   = recent[0];
+    const res = await api.get(`/games/${g.id}/states`);
+    const { states, final_score, game_id } = res;
+    if (!states || states.length === 0) return;
+    replayMeta   = { gameId: game_id, botId: g.bot_id, botName: g.bot_name, finalScore: final_score };
+    replayFrames = states;
+    replayIdx    = 0;
+    tickReplay();
+  } catch (e) { console.error('replay failed:', e); }
+}
+
+function stopReplay() {
+  clearTimeout(replayTimer);
+  replayTimer  = null;
+  replayFrames = [];
+  replayMeta   = null;
+  featuredEl.classList.remove('is-replay');
+}
+
+function tickReplay() {
+  if (activeGame || !replayFrames.length) return;
+  const state       = replayFrames[replayIdx];
+  const displayName = replayMeta.botName || replayMeta.botId.slice(0, 8);
+  const score       = String(state.score || 0).padStart(4, '0');
+
+  gameHeaderEl.innerHTML = `
+    <div>
+      <div class="pg-status-row">
+        <div class="pg-replay-pill">&#9658; REPLAY</div>
+      </div>
+      <div class="pg-bot-name-big">
+        <a href="/bot/${replayMeta.botId}">${displayName}</a>
+      </div>
+    </div>
+    <div class="pg-score-wrap">
+      <div class="pg-score-sup">Score</div>
+      <div class="pg-score-big">${score}</div>
+    </div>
+  `;
+
+  featuredEl.classList.add('is-replay');
+  if (!featuredEl.querySelector('canvas')) {
+    featuredEl.innerHTML = `
+      <canvas></canvas>
+      <div class="pg-replay-badge">&#9658; REPLAY &middot; #${replayMeta.gameId} &middot; ${replayMeta.finalScore} pts</div>
+    `;
+  }
+  renderSnake(featuredEl.querySelector('canvas'), state);
+
+  const len   = state.snake?.length ?? '-';
+  const ticks = state.ticks ?? '-';
+  gameFooterEl.innerHTML = `
+    <div class="pg-ft-stat"><div class="pg-ft-k">Length</div><div class="pg-ft-v">${len}</div></div>
+    <div class="pg-ft-stat"><div class="pg-ft-k">Ticks</div><div class="pg-ft-v">${ticks}</div></div>
+    <div class="pg-ft-stat"><div class="pg-ft-k">Best</div><div class="pg-ft-v">${replayMeta.finalScore}</div></div>
+  `;
+
+  replayIdx   = (replayIdx + 1) % replayFrames.length;
+  replayTimer = setTimeout(tickReplay, 80);
+}
+
+// -- Live Game ------------------------------------------------
 function renderFeatured() {
   if (!activeGame) {
-    gameHeaderEl.innerHTML = '<div class="pg-empty-status">keine aktiven spiele.</div>';
-    featuredEl.innerHTML = '';
-    gameFooterEl.innerHTML = '';
+    if (!replayFrames.length) {
+      gameHeaderEl.innerHTML = '<div class="pg-empty-status">keine aktiven spiele.</div>';
+      featuredEl.innerHTML   = '';
+      gameFooterEl.innerHTML = '';
+    }
     return;
   }
   const displayName = activeGame.botName || activeGame.botId.slice(0, 8);
@@ -43,8 +118,8 @@ function renderFeatured() {
   }
   renderSnake(featuredEl.querySelector('canvas'), activeGame.state);
 
-  const len   = activeGame.state.snake?.length ?? '–';
-  const ticks = activeGame.state.ticks ?? '–';
+  const len   = activeGame.state.snake?.length ?? '-';
+  const ticks = activeGame.state.ticks ?? '-';
   const alive = activeGame.state.alive ? 'ALIVE' : 'DEAD';
   gameFooterEl.innerHTML = `
     <div class="pg-ft-stat"><div class="pg-ft-k">Length</div><div class="pg-ft-v">${len}</div></div>
@@ -121,11 +196,14 @@ stream.on('snapshot', ({ activeGames, queue: queueData }) => {
   queue = (queueData || []).map((q, i) => ({ botId: q.botId, botName: q.botName, position: q.position || i + 1 }));
   renderFeatured();
   renderQueue();
+  if (!activeGame && !replayTimer) startReplay();
 });
 
 stream.on('game:start', ({ gameId, botId, botName, state }) => {
+  stopReplay();
   activeGame = { gameId, botId, botName, state };
   queue = queue.filter(q => q.botId !== botId);
+  featuredEl.innerHTML = '';
   renderFeatured();
   renderQueue();
 });
@@ -142,6 +220,7 @@ stream.on('game:end', () => {
   renderFeatured();
   loadLeaderboard();
   loadRecent();
+  startReplay();
 });
 
 stream.on('queue:add', ({ botId, botName, position }) => {

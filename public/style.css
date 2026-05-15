@@ -250,6 +250,10 @@ tr:first-child td.score { color: var(--accent-yellow); }
   --pg-purple:     #818cf8;
   --pg-f-head:     'Outfit', system-ui, sans-serif;
   --pg-f-mono:     'Space Mono', ui-monospace, Menlo, monospace;
+  --pg-max-width:  1720px;
+  --pg-col-lb:     300px;
+  --pg-col-queue:  300px;
+  --pg-gap:        1rem;
 }
 
 /* ── Body override for index page ─────────────────────────────── */
@@ -294,7 +298,7 @@ body.pg-index a:hover { color: var(--pg-lime); }
 /* ── HEADER ───────────────────────────────────────────────────── */
 .pg-header {
   flex-shrink: 0;
-  padding: 1rem 2rem;
+  padding: .5rem 1.5rem;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -304,10 +308,10 @@ body.pg-index a:hover { color: var(--pg-lime); }
   z-index: 1;
 }
 
-.pg-brand { display: flex; align-items: center; gap: .85rem; }
+.pg-brand { display: flex; align-items: center; gap: .75rem; }
 
 .pg-brand-name {
-  font-size: 1.25rem;
+  font-size: 1.1rem;
   font-weight: 800;
   color: var(--pg-text);
   letter-spacing: -.02em;
@@ -326,7 +330,7 @@ body.pg-index a:hover { color: var(--pg-lime); }
 }
 
 .pg-value-prop {
-  font-size: 1rem;
+  font-size: .88rem;
   color: var(--pg-muted);
   font-weight: 400;
 }
@@ -379,10 +383,10 @@ body.pg-index a:hover { color: var(--pg-lime); }
   flex: 1;
   display: flex;
   flex-direction: column;
-  max-width: 1260px;
+  max-width: var(--pg-max-width);
   width: 100%;
   margin: 0 auto;
-  padding: 1.25rem 2rem;
+  padding: .6rem 1.5rem;
   position: relative;
   z-index: 1;
   min-height: 0;
@@ -394,8 +398,8 @@ body.pg-index a:hover { color: var(--pg-lime); }
   flex: 1;
   min-height: 0;
   display: grid;
-  grid-template-columns: 260px 1fr 272px;
-  gap: 1.25rem;
+  grid-template-columns: var(--pg-col-lb) 1fr var(--pg-col-queue);
+  gap: var(--pg-gap);
   align-items: stretch;
 }
 
@@ -406,7 +410,7 @@ body.pg-index a:hover { color: var(--pg-lime); }
   text-transform: uppercase;
   letter-spacing: .1em;
   color: var(--pg-dim);
-  margin-bottom: .7rem;
+  margin-bottom: .4rem;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -445,7 +449,7 @@ body.pg-index a:hover { color: var(--pg-lime); }
   grid-template-columns: 2.6rem 1fr 5rem;
   align-items: center;
   gap: .4rem;
-  padding: .6rem 1rem;
+  padding: .38rem .85rem;
   border-bottom: 1px solid var(--pg-border);
 }
 .pg-lb-item:last-child { border-bottom: none; }
@@ -511,13 +515,13 @@ body.pg-index a:hover { color: var(--pg-lime); }
 
 .pg-game-header {
   flex-shrink: 0;
-  padding: 1rem 1.25rem;
+  padding: .55rem 1rem;
   border-bottom: 1px solid var(--pg-border);
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
   gap: 1rem;
-  min-height: 5rem;
+  min-height: 3.6rem;
 }
 
 .pg-empty-status {
@@ -546,7 +550,7 @@ body.pg-index a:hover { color: var(--pg-lime); }
 }
 
 .pg-bot-name-big {
-  font-size: 1.3rem;
+  font-size: 1.1rem;
   font-weight: 700;
   color: var(--pg-text);
   letter-spacing: -.02em;
@@ -564,7 +568,7 @@ body.pg-index a:hover { color: var(--pg-lime); }
 
 .pg-score-big {
   font-family: var(--pg-f-mono);
-  font-size: 3rem;
+  font-size: 2.1rem;
   font-weight: 700;
   color: var(--pg-lime);
   line-height: 1;
@@ -574,9 +578,10 @@ body.pg-index a:hover { color: var(--pg-lime); }
 
 /* Canvas zone */
 .pg-canvas-zone {
+  position: relative;
   flex: 1;
   min-height: 0;
-  padding: 1rem;
+  padding: .35rem;
   background: #060010;
   display: flex;
   justify-content: center;
@@ -584,8 +589,8 @@ body.pg-index a:hover { color: var(--pg-lime); }
 }
 
 .pg-canvas-zone canvas {
-  width:  min(100%, calc(100vh - 280px));
-  height: min(100%, calc(100vh - 280px));
+  width:  min(100%, calc(100vh - 165px));
+  height: min(100%, calc(100vh - 165px));
   max-width: 100%;
   image-rendering: pixelated;
   border-radius: 4px;
@@ -600,12 +605,12 @@ body.pg-index a:hover { color: var(--pg-lime); }
 /* Game footer */
 .pg-game-footer {
   flex-shrink: 0;
-  padding: .65rem 1.25rem;
+  padding: .38rem 1rem;
   border-top: 1px solid var(--pg-border);
   display: flex;
-  gap: 2rem;
+  gap: 1.5rem;
   background: var(--pg-bg3);
-  min-height: 2.8rem;
+  min-height: 2.1rem;
 }
 
 .pg-ft-stat { display: flex; flex-direction: column; gap: .05rem; }
@@ -634,7 +639,7 @@ body.pg-index a:hover { color: var(--pg-lime); }
   display: flex;
   align-items: center;
   gap: .6rem;
-  padding: .62rem .95rem;
+  padding: .38rem .85rem;
   border-bottom: 1px solid var(--pg-border);
 }
 .pg-q-item:last-child { border-bottom: none; }
@@ -673,18 +678,18 @@ body.pg-index a:hover { color: var(--pg-lime); }
 
 .pg-q-cta {
   flex-shrink: 0;
-  padding: 1rem;
+  padding: .6rem .85rem;
   border-top: 1px solid var(--pg-border);
   background: var(--pg-bg3);
   font-family: var(--pg-f-mono);
   font-size: .72rem;
   color: var(--pg-muted);
-  line-height: 1.8;
+  line-height: 1.7;
 }
 
 /* ── RECENT GAMES (below arena) ───────────────────────────────── */
 .pg-recent-section {
-  margin-top: .5rem;
+  margin-top: .3rem;
   flex-shrink: 0;
 }
 
@@ -705,6 +710,40 @@ body.pg-index a:hover { color: var(--pg-lime); }
 .pg-recent-section td a:hover { color: var(--pg-lime); }
 .pg-recent-section td.score { color: var(--pg-purple); text-align: right; }
 .pg-recent-section td.timestamp { color: var(--pg-dim); text-align: right; font-size: .72rem; }
+
+/* -- REPLAY EMPTY STATE ----------------------------------------- */
+.pg-replay-pill {
+  font-family: var(--pg-f-mono);
+  font-size: .62rem;
+  font-weight: 700;
+  letter-spacing: .07em;
+  color: var(--pg-orange);
+  background: var(--pg-orange-dim);
+  border: 1px solid rgba(249,115,22,.24);
+  padding: 3px 10px;
+  border-radius: 100px;
+}
+
+.pg-replay-badge {
+  position: absolute;
+  top: .55rem;
+  left: .55rem;
+  font-family: var(--pg-f-mono);
+  font-size: .63rem;
+  letter-spacing: .05em;
+  color: var(--pg-orange);
+  background: rgba(6,0,16,.75);
+  border: 1px solid rgba(249,115,22,.28);
+  padding: 3px 9px;
+  border-radius: 4px;
+  pointer-events: none;
+  z-index: 10;
+}
+
+.pg-canvas-zone.is-replay canvas {
+  opacity: .75;
+}
+
 
 /* ── RESPONSIVE ───────────────────────────────────────────────── */
 @media (max-width: 900px) {
