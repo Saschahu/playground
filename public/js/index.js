@@ -11,7 +11,7 @@ const gameHeaderEl  = document.getElementById('game-header');
 const gameFooterEl  = document.getElementById('game-footer');
 const queueEl       = document.getElementById('queue');
 const leaderboardEl = document.getElementById('leaderboard');
-const recentEl      = document.querySelector('#recent tbody');
+const recentEl      = document.getElementById('recent');
 
 // -- Replay ---------------------------------------------------
 let replayFrames = [];
@@ -66,19 +66,17 @@ function tickReplay() {
 
   featuredEl.classList.add('is-replay');
   if (!featuredEl.querySelector('canvas')) {
-    featuredEl.innerHTML = `
-      <canvas></canvas>
-      <div class="pg-replay-badge">&#9658; REPLAY &middot; #${replayMeta.gameId} &middot; ${replayMeta.finalScore} pts</div>
-    `;
+    featuredEl.innerHTML = "<canvas></canvas>";
   }
   renderSnake(featuredEl.querySelector('canvas'), state);
 
   const len   = state.snake?.length ?? '-';
   const ticks = state.ticks ?? '-';
   gameFooterEl.innerHTML = `
+    <div class="pg-ft-stat"><div class="pg-ft-k">&#9658; Replay</div><div class="pg-ft-v pg-ft-replay">#${replayMeta.gameId.slice(0,8)}</div></div>
     <div class="pg-ft-stat"><div class="pg-ft-k">Length</div><div class="pg-ft-v">${len}</div></div>
     <div class="pg-ft-stat"><div class="pg-ft-k">Ticks</div><div class="pg-ft-v">${ticks}</div></div>
-    <div class="pg-ft-stat"><div class="pg-ft-k">Best</div><div class="pg-ft-v">${replayMeta.finalScore}</div></div>
+    <div class="pg-ft-stat"><div class="pg-ft-k">Score</div><div class="pg-ft-v">${replayMeta.finalScore}</div></div>
   `;
 
   replayIdx   = (replayIdx + 1) % replayFrames.length;
@@ -173,16 +171,15 @@ async function loadLeaderboard() {
 async function loadRecent() {
   try {
     const recent = await api.get('/games/recent?limit=15');
-    recentEl.innerHTML = recent.map(g => {
+    recentEl.innerHTML = recent.map((g, i) => {
       const name = g.bot_name || g.bot_id.slice(0, 8);
-      return `
-      <tr>
-        <td><a href="/bot/${g.bot_id}">${name}</a></td>
-        <td class="score"><a href="/replay/${g.id}">${g.final_score}</a></td>
-        <td class="timestamp">${timeAgo(g.ended_at)}</td>
-      </tr>
-    `;
-    }).join('') || '<tr><td colspan="3" style="color:var(--pg-dim)">noch keine spiele beendet.</td></tr>';
+      return `<div class="pg-recent-card">
+        <div class="pg-rc-rank">#${i + 1}</div>
+        <div class="pg-rc-name"><a href="/bot/${g.bot_id}">${name}</a></div>
+        <div class="pg-rc-score"><a href="/replay/${g.id}">${g.final_score}</a></div>
+        <div class="pg-rc-time">${timeAgo(g.ended_at)}</div>
+      </div>`;
+    }).join('') || '<div style="color:var(--pg-dim);padding:.5rem">noch keine spiele beendet.</div>';
   } catch (e) { console.error('recent load failed:', e); }
 }
 
