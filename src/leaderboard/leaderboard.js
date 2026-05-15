@@ -4,14 +4,15 @@ export class Leaderboard {
   top(limit = 20, period = 'all') {
     let where = '';
     const params = [];
-    if (period === 'day') { where = "AND ended_at >= datetime('now', '-1 day')"; }
-    else if (period === 'week') { where = "AND ended_at >= datetime('now', '-7 days')"; }
+    if (period === 'day') { where = "AND g.ended_at >= datetime('now', '-1 day')"; }
+    else if (period === 'week') { where = "AND g.ended_at >= datetime('now', '-7 days')"; }
 
     return this.db.prepare(`
-      SELECT bot_id, MAX(final_score) AS best_score, COUNT(*) AS games
-      FROM games
-      WHERE ended_at IS NOT NULL ${where}
-      GROUP BY bot_id
+      SELECT g.bot_id, b.name AS bot_name, MAX(g.final_score) AS best_score, COUNT(*) AS games
+      FROM games g
+      JOIN bots b ON b.id = g.bot_id
+      WHERE g.ended_at IS NOT NULL AND g.status = 'ended' ${where}
+      GROUP BY g.bot_id
       ORDER BY best_score DESC
       LIMIT ?
     `).all(...params, limit);
