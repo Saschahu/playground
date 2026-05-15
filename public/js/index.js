@@ -160,8 +160,10 @@ async function loadLeaderboard() {
       return `
       <div class="pg-lb-item">
         <div class="pg-lb-rank-wrap">${rankHtml}</div>
-        <div class="pg-lb-name"><a href="/bot/${row.bot_id}">${name}</a></div>
-        <div class="pg-lb-score">${row.best_score.toLocaleString()}</div>
+        <div class="pg-lb-info">
+          <div class="pg-lb-name"><a href="/bot/${row.bot_id}">${name}</a></div>
+          <div class="pg-lb-score">${row.best_score.toLocaleString()}</div>
+        </div>
       </div>
     `;
     }).join('');
