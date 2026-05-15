@@ -3,42 +3,67 @@ import { LiveStream } from './ws.js';
 import { renderSnake } from './renderer.js';
 import { timeAgo } from './time.js';
 
-let activeGame = null;  // { gameId, botId, botName, state }
-let queue = [];          // [{ botId, botName, position }]
+let activeGame = null;
+let queue = [];
 
-const featuredEl = document.getElementById('featured');
-const queueEl = document.getElementById('queue');
-const leaderboardEl = document.querySelector('#leaderboard tbody');
-const recentEl = document.querySelector('#recent tbody');
+const featuredEl    = document.getElementById('featured');
+const gameHeaderEl  = document.getElementById('game-header');
+const gameFooterEl  = document.getElementById('game-footer');
+const queueEl       = document.getElementById('queue');
+const leaderboardEl = document.getElementById('leaderboard');
+const recentEl      = document.querySelector('#recent tbody');
 
 function renderFeatured() {
   if (!activeGame) {
-    featuredEl.innerHTML = '<div class="empty-arena">keine aktiven spiele.</div>';
+    gameHeaderEl.innerHTML = '<div class="pg-empty-status">keine aktiven spiele.</div>';
+    featuredEl.innerHTML = '';
+    gameFooterEl.innerHTML = '';
     return;
   }
   const displayName = activeGame.botName || activeGame.botId.slice(0, 8);
-  featuredEl.innerHTML = `
-    <canvas></canvas>
-    <div class="meta">
-      <span class="name"><a href="/bot/${activeGame.botId}">${displayName}</a></span>
-      <span class="score">${activeGame.state.score} pts</span>
-      <span class="ticks">${activeGame.state.ticks} ticks</span>
+  const score = String(activeGame.state.score || 0).padStart(4, '0');
+
+  gameHeaderEl.innerHTML = `
+    <div>
+      <div class="pg-status-row">
+        <div class="pg-now-pill">NOW PLAYING</div>
+      </div>
+      <div class="pg-bot-name-big">
+        <a href="/bot/${activeGame.botId}">${displayName}</a>
+      </div>
+    </div>
+    <div class="pg-score-wrap">
+      <div class="pg-score-sup">Score</div>
+      <div class="pg-score-big">${score}</div>
     </div>
   `;
+
+  if (!featuredEl.querySelector('canvas')) {
+    featuredEl.innerHTML = '<canvas></canvas>';
+  }
   renderSnake(featuredEl.querySelector('canvas'), activeGame.state);
+
+  const len   = activeGame.state.snake?.length ?? '–';
+  const ticks = activeGame.state.ticks ?? '–';
+  const alive = activeGame.state.alive ? 'ALIVE' : 'DEAD';
+  gameFooterEl.innerHTML = `
+    <div class="pg-ft-stat"><div class="pg-ft-k">Length</div><div class="pg-ft-v">${len}</div></div>
+    <div class="pg-ft-stat"><div class="pg-ft-k">Ticks</div><div class="pg-ft-v">${ticks}</div></div>
+    <div class="pg-ft-stat"><div class="pg-ft-k">Status</div><div class="pg-ft-v">${alive}</div></div>
+  `;
 }
 
 function renderQueue() {
   if (queue.length === 0) {
-    queueEl.innerHTML = '<div class="empty-queue">leer.</div>';
+    queueEl.innerHTML = '<div class="pg-q-empty">leer.</div>';
     return;
   }
   queueEl.innerHTML = queue.map(q => {
     const displayName = q.botName || q.botId.slice(0, 8);
     return `
-    <div class="queue-item">
-      <span class="pos">${q.position}</span>
-      <span class="name"><a href="/bot/${q.botId}">${displayName}</a></span>
+    <div class="pg-q-item">
+      <div class="pg-q-badge">${q.position}</div>
+      <div class="pg-q-name"><a href="/bot/${q.botId}">${displayName}</a></div>
     </div>
   `;
   }).join('');
@@ -47,16 +72,24 @@ function renderQueue() {
 async function loadLeaderboard() {
   try {
     const top = await api.get('/leaderboard?limit=20');
+    if (!top || top.length === 0) {
+      leaderboardEl.innerHTML = '<div class="pg-lb-empty">noch keine scores.</div>';
+      return;
+    }
     leaderboardEl.innerHTML = top.map((row, i) => {
-      const name = row.bot_name || row.bot_id.slice(0, 8);
+      const name    = row.bot_name || row.bot_id.slice(0, 8);
+      const isChamp = i === 0;
+      const rankHtml = isChamp
+        ? `<div class="pg-lb-rank champ">1</div>`
+        : `<div class="pg-lb-rank">#${i + 1}</div>`;
       return `
-      <tr>
-        <td class="rank">${i + 1}</td>
-        <td><a href="/bot/${row.bot_id}">${name}</a></td>
-        <td class="score">${row.best_score}</td>
-      </tr>
+      <div class="pg-lb-item">
+        <div class="pg-lb-rank-wrap">${rankHtml}</div>
+        <div class="pg-lb-name"><a href="/bot/${row.bot_id}">${name}</a></div>
+        <div class="pg-lb-score">${row.best_score.toLocaleString()}</div>
+      </div>
     `;
-    }).join('') || '<tr><td colspan="3" style="color:var(--text-very-dim)">noch keine scores.</td></tr>';
+    }).join('');
   } catch (e) { console.error('leaderboard load failed:', e); }
 }
 
@@ -72,7 +105,7 @@ async function loadRecent() {
         <td class="timestamp">${timeAgo(g.ended_at)}</td>
       </tr>
     `;
-    }).join('') || '<tr><td colspan="3" style="color:var(--text-very-dim)">noch keine spiele beendet.</td></tr>';
+    }).join('') || '<tr><td colspan="3" style="color:var(--pg-dim)">noch keine spiele beendet.</td></tr>';
   } catch (e) { console.error('recent load failed:', e); }
 }
 
