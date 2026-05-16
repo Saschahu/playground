@@ -167,8 +167,6 @@ async function loadLeaderboard() {
   } catch (e) { console.error('leaderboard load failed:', e); }
 }
 
-}
-
 loadLeaderboard();
 
 const stream = new LiveStream();
