@@ -498,7 +498,7 @@ body.pg-index a:hover { color: var(--pg-lime); }
 .pg-lb-score {
   font-family: var(--pg-f-mono);
   font-size: .75rem;
-  color: var(--pg-dim);
+  color: var(--pg-text);
   font-variant-numeric: tabular-nums;
 }
 
