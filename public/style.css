@@ -515,7 +515,7 @@ body.pg-index a:hover { color: var(--pg-lime); }
   flex-direction: column;
   min-height: 0;
   justify-self: center;
-  width: min(75vh, 800px);
+  width: min(88vh, 1100px);
   max-width: 100%;
 }
 
@@ -598,7 +598,7 @@ body.pg-index a:hover { color: var(--pg-lime); }
   width: 100%;
   height: auto;
   aspect-ratio: 1;
-  max-height: min(75vh, 800px);
+  max-height: min(88vh, 1100px);
   max-width: 100%;
   image-rendering: pixelated;
   border-radius: 4px;
@@ -693,70 +693,6 @@ body.pg-index a:hover { color: var(--pg-lime); }
   font-size: .72rem;
   color: var(--pg-muted);
   line-height: 1.7;
-}
-
-/* ── RECENT GAMES (below arena) ───────────────────────────────── */
-.pg-recent-section {
-  margin-top: .3rem;
-  flex-shrink: 0;
-  max-height: min(32vh, 360px);
-  overflow-y: auto;
-}
-
-.pg-recent-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: .4rem;
-}
-
-.pg-recent-card {
-  background: var(--pg-bg2);
-  border: 1px solid var(--pg-border);
-  border-radius: 6px;
-  padding: .45rem .75rem;
-  display: grid;
-  grid-template-columns: 2rem 1fr auto;
-  grid-template-rows: auto auto;
-  column-gap: .4rem;
-  row-gap: .05rem;
-  align-items: center;
-}
-.pg-recent-card:hover { border-color: var(--pg-dim); }
-
-.pg-rc-rank {
-  grid-row: 1 / 3;
-  font-family: var(--pg-f-mono);
-  font-size: .7rem;
-  color: var(--pg-dim);
-  text-align: center;
-}
-
-.pg-rc-name {
-  font-size: .88rem;
-  font-weight: 500;
-  color: var(--pg-text);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-.pg-rc-name a { color: inherit; border-bottom: none; }
-.pg-rc-name a:hover { color: var(--pg-lime); }
-
-.pg-rc-score {
-  font-family: var(--pg-f-mono);
-  font-size: .88rem;
-  color: var(--pg-purple);
-  font-variant-numeric: tabular-nums;
-  text-align: right;
-  grid-row: 1;
-}
-.pg-rc-score a { color: inherit; border-bottom: none; }
-
-.pg-rc-time {
-  font-family: var(--pg-f-mono);
-  font-size: .68rem;
-  color: var(--pg-dim);
-  grid-column: 2 / 4;
 }
 
 /* -- REPLAY EMPTY STATE ----------------------------------------- */

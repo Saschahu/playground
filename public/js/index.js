@@ -11,7 +11,6 @@ const gameHeaderEl  = document.getElementById('game-header');
 const gameFooterEl  = document.getElementById('game-footer');
 const queueEl       = document.getElementById('queue');
 const leaderboardEl = document.getElementById('leaderboard');
-const recentEl      = document.getElementById('recent');
 
 // -- Replay ---------------------------------------------------
 let replayFrames = [];
@@ -168,23 +167,9 @@ async function loadLeaderboard() {
   } catch (e) { console.error('leaderboard load failed:', e); }
 }
 
-async function loadRecent() {
-  try {
-    const recent = await api.get('/games/recent?limit=15');
-    recentEl.innerHTML = recent.map((g, i) => {
-      const name = g.bot_name || g.bot_id.slice(0, 8);
-      return `<div class="pg-recent-card">
-        <div class="pg-rc-rank">#${i + 1}</div>
-        <div class="pg-rc-name"><a href="/bot/${g.bot_id}">${name}</a></div>
-        <div class="pg-rc-score"><a href="/replay/${g.id}">${g.final_score}</a></div>
-        <div class="pg-rc-time">${timeAgo(g.ended_at)}</div>
-      </div>`;
-    }).join('') || '<div style="color:var(--pg-dim);padding:.5rem">noch keine spiele beendet.</div>';
-  } catch (e) { console.error('recent load failed:', e); }
 }
 
 loadLeaderboard();
-loadRecent();
 
 const stream = new LiveStream();
 
@@ -218,7 +203,6 @@ stream.on('game:end', () => {
   activeGame = null;
   renderFeatured();
   loadLeaderboard();
-  loadRecent();
   startReplay();
 });
 
@@ -235,4 +219,3 @@ stream.on('queue:promote', ({ botId }) => {
 });
 
 setInterval(loadLeaderboard, 30000);
-setInterval(loadRecent, 30000);
