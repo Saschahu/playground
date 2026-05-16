@@ -368,7 +368,7 @@ body.pg-index a:hover { color: var(--pg-lime); }
   font-family: var(--pg-f-mono);
   font-size: .75rem;
   font-weight: 700;
-  color: #000;
+  color: #000 !important;
   background: var(--pg-lime);
   padding: .42rem 1.1rem;
   text-decoration: none;
@@ -376,7 +376,7 @@ body.pg-index a:hover { color: var(--pg-lime); }
   letter-spacing: -.01em;
   white-space: nowrap;
 }
-.pg-btn-join:hover { background: #bef264; color: #000; }
+.pg-btn-join:hover { background: #bef264; color: #000 !important; }
 
 /* ── MAIN WRAP ────────────────────────────────────────────────── */
 .pg-wrap {
