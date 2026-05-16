@@ -394,7 +394,7 @@ body.pg-index a:hover { color: var(--pg-lime); }
 /* ── ARENA GRID ───────────────────────────────────────────────── */
 .pg-arena {
   flex: 1;
-  min-height: 0;
+  min-height: 400px;
   display: grid;
   grid-template-columns: var(--pg-col-lb) 1fr var(--pg-col-queue);
   gap: var(--pg-gap);
@@ -699,6 +699,8 @@ body.pg-index a:hover { color: var(--pg-lime); }
 .pg-recent-section {
   margin-top: .3rem;
   flex-shrink: 0;
+  max-height: min(32vh, 360px);
+  overflow-y: auto;
 }
 
 .pg-recent-grid {
